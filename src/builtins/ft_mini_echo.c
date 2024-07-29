@@ -6,16 +6,16 @@
 /*   By: ajabado <ajabado@student.42beirut.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/19 10:44:12 by akaterji          #+#    #+#             */
-/*   Updated: 2024/07/29 22:29:31 by ajabado          ###   ########.fr       */
+/*   Updated: 2024/07/29 23:28:49 by ajabado          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/minishell.h"
 
-void	ft_putstr_modified_fd(t_data *data, char *str, int fd);
-int		ft_dollar_case(t_data *data, char *str, int index);
+void	ft_putstr_modified_fd(char *str, int fd);
+// int		ft_dollar_case(t_data *data, char *str, int index);
 
-void	ft_print_without_quotes(t_data *data, char *str)
+void	ft_print_without_quotes(char *str)
 {
 	int	i;
 
@@ -28,8 +28,8 @@ void	ft_print_without_quotes(t_data *data, char *str)
 			if (str[i])
 				ft_putchar_fd(str[i], STDOUT_FILENO);
 		}
-		else if (str[i] == '$' && str[i + 1] != '\0')
-			i = ft_dollar_case(data, str, i);
+		// else if (str[i] == '$' && str[i + 1] != '\0')
+		// 	i = ft_dollar_case(data, str, i);
 		else
 			write(STDOUT_FILENO, &str[i], 1);
 		if (str[i] != '\0')
@@ -37,7 +37,7 @@ void	ft_print_without_quotes(t_data *data, char *str)
 	}
 }
 
-int	ft_quote_case(t_data *data, char *str, int index, int type)
+int	ft_quote_case(char *str, int index, int type)
 {
 	int		count;
 	int		new_index;
@@ -48,7 +48,7 @@ int	ft_quote_case(t_data *data, char *str, int index, int type)
 	if (count % 2 == 0)
 	{
 		tmp = ft_substr(str, index + 1, new_index -1);
-		ft_print_without_quotes(data, tmp);
+		ft_print_without_quotes(tmp);
 		free(tmp);
 		return (new_index + index);
 	}
@@ -57,26 +57,26 @@ int	ft_quote_case(t_data *data, char *str, int index, int type)
 	return (index + new_index);
 }
 
-int	ft_dollar_case(t_data *data, char *str, int index)
-{
-	int		new_index;
-	char	*tmp;
+// int	ft_dollar_case(t_data *data, char *str, int index)
+// {
+// 	int		new_index;
+// 	char	*tmp;
 
-	new_index = index + 1;
-	while (str[new_index] != '\0')
-	{
-		if (str[new_index] && (str[new_index] == '$'
-				|| is_whitespace(str[new_index]
-					|| str[new_index] == 34 || str[new_index] == 39)))
-			break ;
-		new_index++;
-	}
-	tmp = ft_substr(str, index + 1, new_index -1);
-	ft_get_variable(tmp, data->envp);
-	return (new_index -1);
-}
+// 	new_index = index + 1;
+// 	while (str[new_index] != '\0')
+// 	{
+// 		if (str[new_index] && (str[new_index] == '$'
+// 				|| is_whitespace(str[new_index]
+// 					|| str[new_index] == 34 || str[new_index] == 39)))
+// 			break ;
+// 		new_index++;
+// 	}
+// 	tmp = ft_substr(str, index + 1, new_index -1);
+// 	ft_get_variable(tmp, data->envp);
+// 	return (new_index -1);
+// }
 
-void	ft_putstr_modified_fd(t_data *data, char *str, int fd)
+void	ft_putstr_modified_fd(char *str, int fd)
 {
 	int	i;
 
@@ -90,10 +90,10 @@ void	ft_putstr_modified_fd(t_data *data, char *str, int fd)
 				ft_putchar_fd(str[i], fd);
 		}
 		else if ((str[i] == 34 || str[i] == 39))
-			i = ft_quote_case(data, str, i, str[i]);
-		else if (str[i] == '$' && str[i + 1] != '\0'
-			&& (str[i + 1] != 34 && str[i + 1] != 39))
-			i = ft_dollar_case(data, str, i);
+			i = ft_quote_case(str, i, str[i]);
+		// else if (str[i] == '$' && str[i + 1] != '\0'
+		// 	&& (str[i + 1] != 34 && str[i + 1] != 39))
+		// 	i = ft_dollar_case(data, str, i);
 		else
 			write(fd, &str[i], 1);
 		if (str[i])
@@ -155,7 +155,7 @@ void	ft_print_echo(t_data *data, t_lexer *lexer_list, int flag)
 		ft_reset_data(data);
 	while (tmp_list)
 	{
-		ft_putstr_modified_fd(data, tmp_list->lexer_comp, STDOUT_FILENO);
+		ft_putstr_modified_fd(tmp_list->lexer_comp, STDOUT_FILENO);
 		if (tmp_list->next)
 			ft_putstr_fd(" ", STDOUT_FILENO);
 		tmp_list = tmp_list->next;

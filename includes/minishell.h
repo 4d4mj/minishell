@@ -6,7 +6,7 @@
 /*   By: ajabado <ajabado@student.42beirut.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/13 13:15:05 by akaterji          #+#    #+#             */
-/*   Updated: 2024/07/29 21:55:35 by ajabado          ###   ########.fr       */
+/*   Updated: 2024/07/30 01:03:01 by ajabado          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -144,6 +144,7 @@ char	**ft_arrdup(char **arr);
 void	ft_arrdup_modified(t_data *data, char **arr, char *str);
 int		ft_count_quotes(char *line);
 char	*ft_check_quotes(char *str);
+char	*remove_quotes(char *str);
 //lexer functions
 int		ft_handle_token(t_data *data, int index, t_lexer **lexer_list);
 int		ft_lexer_add(char *readline, int type, t_lexer **lexer_list);

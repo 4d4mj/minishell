@@ -135,7 +135,7 @@ void	ft_mini_cd(t_data *data, t_cmd *cmd_list)
 	lexer_list = cmd_list->lexer_list->next;
 	if (!lexer_list)
 		return ;
-	path = ft_cd_case(data, lexer_list->lexer_comp, ft_strdup(data->pwd), -1);
+	path = ft_cd_case(data, remove_quotes(lexer_list->lexer_comp), ft_strdup(data->pwd), -1);
 	check = chdir(path);
 	if (check)
 	{

@@ -3,23 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   ft_expander_utils.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: akaterji <akaterji@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ajabado <ajabado@student.42beirut.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/26 09:19:13 by akaterji          #+#    #+#             */
-/*   Updated: 2024/07/26 09:19:33 by akaterji         ###   ########.fr       */
+/*   Updated: 2024/07/29 22:56:27 by ajabado          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/minishell.h"
-
-void	ft_strcpys(char *dst, const char *src)
-{
-	if (!src)
-		return ;
-	while (*src)
-		*dst++ = *src++;
-	*dst = '\0';
-}
 
 char	*ft_strjoin_modified(char *s1, char const *s2)
 {
@@ -32,8 +23,8 @@ char	*ft_strjoin_modified(char *s1, char const *s2)
 	join = malloc((s1_len + s2_len + 1));
 	if (!join)
 		return (NULL);
-	ft_strcpys(join, s1);
-	ft_strcpys((join + s1_len), s2);
+	ft_strcpy(join, s1);
+	ft_strcpy((join + s1_len), s2);
 	if (s1)
 		free(s1);
 	return (join);

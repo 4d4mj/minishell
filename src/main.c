@@ -6,7 +6,7 @@
 /*   By: ajabado <ajabado@student.42beirut.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/13 13:17:03 by akaterji          #+#    #+#             */
-/*   Updated: 2024/07/29 22:35:25 by ajabado          ###   ########.fr       */
+/*   Updated: 2024/07/30 01:10:34 by ajabado          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 t_signal	g_signal;
 void	ft_minishell_loop(t_data *data);
-char *ft_process_dollar_signs(char *tmp, t_env *env_list, int i, int j);
+// char *ft_process_dollar_signs(char *tmp, t_env *env_list, int i, int j);
 
 void	ft_reset_data(t_data *data)
 {
@@ -199,228 +199,86 @@ void ft_error_dir(t_data *data, char *comp, int type)
 	}
 	ft_check_after_dir(data);
 }
-void	ft_check_is_dollar(t_data *data)
-{
-	t_env	*cur_env;
-	int		len;
 
-	cur_env = data->env_list;
-	if (data->readline[0] == '$')
-	{
-		while (cur_env)
-		{
-			len = ft_strlen(cur_env->env_var);
-			if (!ft_strncmp(cur_env->env_var, data->readline, len)
-				&& (data->readline[len] == '\0'
-					|| is_whitespace(data->readline[len])))
-			{
-				if (!ft_strcmp(cur_env->env_var, "$HOME"))
-					ft_error_dir(data, cur_env->env_comp, IS_DIR);
-				else
-					ft_error_dir(data, cur_env->env_comp, NOT_DIR);
-			}
-			cur_env = cur_env->next;
-		}
-		if (!cur_env)
-			ft_error_dir(data, NULL, NOT_DIR);
-	}
-}
-static t_env	*ft_find_env_var(char *str, t_env *env_list)
+static char	*ft_find_env_var(char *str, t_env *env_list, int *len)
 {
 	while (env_list)
 	{
-		if (!ft_strcmp(str, env_list->env_var))
-			return (env_list);
+		if (!ft_strncmp(str, env_list->env_var, ft_strlen(env_list->env_var)))
+		{
+			*len = ft_strlen(env_list->env_var);
+			return (env_list->env_comp);
+		}
 		env_list = env_list->next;
 	}
 	return (NULL);
 }
 
-char *ft_get_var(char *str, t_env *env_list)
+char *remove_quotes(char *str)
 {
-	t_env	*env_var;
+    int len = strlen(str);
+    if (len >= 2 && ((str[0] == '"' && str[len - 1] == '"') || (str[0] == '\'' && str[len - 1] == '\'')))
+    {
+        char *new_str = ft_substr(str, 1, len - 2); // Create a new substring without the outer quotes
+        char *result = remove_quotes(new_str); // Recursively remove quotes
+        free(new_str); // Free the intermediate string
+        return result;
+    }
+    return strdup(str); // Return a duplicate of str if no quotes
+}
 
-	env_var = ft_find_env_var(str, env_list);
-	free(str);
-	if (env_var)
+char *ft_strjoin_arr(char **arr, char c)
+{
+	int i = -1;
+	int len = 0;
+	while (arr[++i])
+		len += strlen(arr[i]);
+	char *new = malloc(len + i + 1);
+	i = -1;
+	int j = 0;
+	while (arr[++i])
 	{
-		return (ft_strdup(env_var->env_comp));
+		strcpy(&new[j], arr[i]);
+		j += strlen(arr[i]);
+		new[j++] = c;
 	}
-	return (ft_strdup(" "));
+	new[j - 1] = '\0';
+	return new;
 }
 
-// static char	*ft_extract_prefix(char *tmp, int *i)
-// {
-// 	char	*prefix;
-// 	char	*new;
-
-// 	prefix = ft_substr(tmp, 0, *i);
-// 	new = ft_strjoin_modified(NULL, prefix);
-// 	free(prefix);
-// 	*i += 1;
-// 	return (new);
-// }
-char	*ft_process_variable(char *tmp, t_env *env_list, int *i)
+char *ft_replace_substr(char *str, char *substr, int start, int len)
 {
-	int		j;
-	char	*var_name;
-	char	*value;
-	char	*new;
-
-	j = 1;
-	var_name = NULL;
-	while (tmp[*i + j] != '\0' && !is_whitespace(tmp[*i + j]) && tmp[*i + j] != '$')
-		j++;
-	var_name = ft_substr(tmp, *i, j);
-	value = ft_get_var(var_name, env_list);
-	new = ft_strjoin_modified(NULL, value);
-	free(value);
-	*i += j;
-	return (new);
+	int new_len = strlen(str) - len + strlen(substr) + 1;
+	char *new_str = malloc(new_len + 1);
+	strncpy(new_str, str, start);
+	strcpy(&new_str[start], substr);
+	strcpy(&new_str[start + strlen(substr)], str + start + len);
+	new_str[new_len] = '\0';
+	return new_str;
 }
-static char	*handle_single_quotes(char *tmp, int *i, int *j)
+
+void ft_replace_variables(char **str, t_env *env_list)
 {
-	int		count;
-	char	*prefix;
-	char	*new;
+    char *env_var;
+    char *new_str;
+    int i = 0;
+    int var_len = 0;
 
-	count = 0;
-	*j += ft_find_matching_quote(tmp, *i, &count, 39);
-	if (count % 2 == 0)
-	{
-		prefix = ft_substr(tmp, *i, *j + 1);
-		new = ft_strdup(prefix);
-		free(prefix);
-		*i += *j;
-		*j = 0;
-		return (new);
-	}
-	return (tmp);
-}
-
-static char *handle_double_quotes(char *tmp, t_env *env_list, int *i, int *j)
-{
-	int		count;
-	char	*prefix;
-	char	*new;
-	char	*new_withquote;
-
-	count = 0;
-	*j += ft_find_matching_quote(tmp, *i, &count, 34);
-	if (count % 2 == 0)
-	{
-		prefix = ft_substr(tmp, *i + 1, *j - 1);
-		new_withquote = ft_process_dollar_signs(prefix, env_list, 0, 0);
-		new = ft_strdup(new_withquote);
-		free(new_withquote);
-		free(prefix);
-		*i += *j;
-		*j = 0;
-		if (tmp[*i] != '\0')
-			(*i)++;
-	}
-	else
-	{
-		new = ft_strdup("");
-	}
-	return (new);
-}
-
-static char *handle_dollar_sign(char *tmp, t_env *env_list, int *i, int *j)
-	{
-	char	*prefix;
-	char	*variable_result;
-	char	*new;
-	char	*new_with_variable;
-
-	prefix = ft_substr(tmp, *i, *j);
-	new = ft_strdup(prefix);
-	free(prefix);
-	*i += *j;
-	*j = 0;
-	if (tmp[*i] == '$')
-	{
-		variable_result = ft_process_variable(tmp, env_list, i);
-		new_with_variable = ft_strjoin_modified(new, variable_result);
-		new = new_with_variable;
-		free(variable_result);
-	}
-	if (tmp[*i] != '\0')
-		(*i)++;
-	return (new);
-}
-
-char	*handle_string(char *tmp, int *i, int *j)
-{
-	char	*prefix;
-	char	*new;
-
-	prefix = ft_substr(tmp, *i, *j);
-	new = ft_strdup(prefix);
-	free(prefix);
-	*i += *j;
-	*j = 0;
-	if (tmp[*i] != '\0')
-		(*i)++;
-	return (new);
-}
-static char *append_and_free(char *old_str, char *new_str)
-{
-	char	*result;
-
-	if (old_str == NULL)
-		result = ft_strdup(new_str);
-	else
-		result = ft_strjoin_modified(old_str, new_str);
-	free(new_str);
-	return (result);
-}
-
-char *ft_process_dollar_signs(char *tmp, t_env *env_list, int i, int j)
-{
-	char	*new;
-	char	*result;
-
-	new = ft_strdup("");
-	while (tmp[i] != '\0')
-	{
-		j = 0;
-		result = NULL;
-		while (tmp[i + j] != '\0' && tmp[i + j] != '$'
-			&& tmp[i + j] != 34 && tmp[i + j] != 39)
-			j++;
-		if (tmp[i + j] == 39)
-			result = handle_single_quotes(tmp, &i, &j);
-		else if (tmp[i + j] == 34)
-			result = handle_double_quotes(tmp, env_list, &i, &j);
-		else if (tmp[i + j] == '$')
-			result = handle_dollar_sign(tmp, env_list, &i, &j);
-		else if (tmp[i + j] == '\0')
-			result = handle_string(tmp, &i, &j);
-		if (result)
-			new = append_and_free(new, result);
-		if (tmp[i] != '\0')
-			i++;
-	}
-	return (new);
-}
-
-void	ft_check_dollar_sign(t_data *data)
-{
-	t_lexer	*current_lexer;
-	char	*tmp;
-	char	*new;
-
-	current_lexer = data->lexer_list;
-	while (current_lexer)
-	{
-		tmp = ft_strdup(current_lexer->lexer_comp);
-		new = ft_process_dollar_signs(tmp, data->env_list, 0, 0);
-		free(tmp);
-		free(current_lexer->lexer_comp);
-		current_lexer->lexer_comp = new;
-		current_lexer = current_lexer->next;
-	}
+    while ((*str)[i])
+    {
+        if ((*str)[i] == '$')
+        {
+            env_var = ft_find_env_var(&(*str)[i], env_list, &var_len);
+            if (env_var)
+            {
+                new_str = ft_replace_substr(*str, env_var, i, var_len);
+                free(*str);
+                *str = new_str;
+                i += strlen(env_var) - 1;
+            }
+        }
+        i++;
+    }
 }
 
 char *get_readline(t_data *data)
@@ -434,6 +292,16 @@ char *get_readline(t_data *data)
 	return (str);
 }
 
+void ft_replace_value(t_lexer *lexer_list, t_env *env_list)
+{
+    t_lexer *current_lexer = lexer_list;
+    while (current_lexer)
+    {
+        ft_replace_variables(&(current_lexer->lexer_comp), env_list);
+        current_lexer = current_lexer->next;
+    }
+}
+
 void	ft_minishell_loop(t_data *data)
 {
 	int		token;
@@ -444,15 +312,11 @@ void	ft_minishell_loop(t_data *data)
 	data->readline = readline(str);
 	free(str);
 	ft_trim_readline(data);
-	ft_check_if_empty(data);
-	ft_check_explanation(data);
-	ft_check_is_directory(data, data->readline, 0);
-	ft_check_is_dollar(data);
 	if (!ft_count_quotes(data->readline))
 		return (ft_error("unable to find the next quote\n", data));
 	if (!ft_lexer_reader(data))
 		return (ft_error("memory error: unable to assign memory\n", data));
-	ft_check_dollar_sign(data);
+	ft_replace_value(data->lexer_list, data->env_list);
 	token = ft_check_token_start_end(data->readline);
 	if (token)
 		ft_error_double_token(data, token);
