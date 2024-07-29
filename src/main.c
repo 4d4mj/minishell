@@ -6,7 +6,7 @@
 /*   By: ajabado <ajabado@student.42beirut.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/13 13:17:03 by akaterji          #+#    #+#             */
-/*   Updated: 2024/07/30 01:10:34 by ajabado          ###   ########.fr       */
+/*   Updated: 2024/07/30 01:48:26 by ajabado          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 t_signal	g_signal;
 void	ft_minishell_loop(t_data *data);
-// char *ft_process_dollar_signs(char *tmp, t_env *env_list, int i, int j);
+void ft_check_after_dir(t_data *data);
 
 void	ft_reset_data(t_data *data)
 {
@@ -107,32 +107,43 @@ int	ft_check_token_start_end(char *line)
 		return (type_e);
 	return (0);
 }
-
-void	ft_check_is_directory(t_data *data, char *str, int i)
+void ft_error_dir(t_data *data, char *comp, int type)
 {
-	if (str[i] == '/' || str[i] == '~')
+	if (type == IS_DIR)
 	{
-		if (str[i] == '/')
+		ft_putstr_fd("minishell: ", STDERR_FILENO);
+		ft_putstr_fd(comp, STDERR_FILENO);
+		ft_putstr_fd(" : Is a directory\n", STDERR_FILENO);
+		g_signal.exit_status = IS_DIR;
+	}
+	else if (comp)
+	{
+		ft_putstr_fd("minishell: command not found: ", STDERR_FILENO);
+		ft_putstr_fd(comp, STDERR_FILENO);
+		ft_putstr_fd("\n", STDERR_FILENO);
+		g_signal.exit_status = NOT_DIR;
+	}
+	ft_check_after_dir(data);
+}
+
+int	ft_check_is_directory(char *str, t_data *data)
+{
+	int flag = 0;
+	struct stat path_stat;
+	if (str[0] == '/')
+	{
+		flag = 1;
+		if (stat(str, &path_stat) == 0)
 		{
-			while (str[++i])
-			{
-				if (str[i] == '/' || str[i] == '.')
-					;
-				else
-					break ;
-			}
+			if (S_ISDIR(path_stat.st_mode))
+				ft_error_dir(data, str, IS_DIR);
+			else
+				ft_error_dir(data, str, NOT_DIR);
 		}
 		else
-			i++;
-		if (str[i] == '\0')
-		{
-			ft_putstr_fd("minishell: ", STDERR_FILENO);
-			ft_putstr_fd(str, STDERR_FILENO);
-			ft_putstr_fd(" : Is a directory\n", STDERR_FILENO);
-			g_signal.exit_status = IS_DIR;
-			ft_reset_data(data);
-		}
+			perror("stat");
 	}
+	return flag;
 }
 
 void	ft_check_if_empty(t_data *data)
@@ -147,7 +158,7 @@ void	ft_check_if_empty(t_data *data)
 	{
 		if (data->readline[1] == '\0')
 		{
-			ft_putstr_fd("minishell: .:filename argument required\n",
+			ft_putstr_fd("minishell: .: filename argument required\n",
 				STDERR_FILENO);
 			g_signal.exit_status = 2;
 			ft_reset_data(data);
@@ -181,24 +192,6 @@ void ft_check_after_dir(t_data *data)
 	else
 		ft_reset_data(data);
 }
-void ft_error_dir(t_data *data, char *comp, int type)
-{
-	if (type == IS_DIR)
-	{
-		ft_putstr_fd("minishell: ", STDERR_FILENO);
-		ft_putstr_fd(comp, STDERR_FILENO);
-		ft_putstr_fd(" : Is a directory\n", STDERR_FILENO);
-		g_signal.exit_status = IS_DIR;
-	}
-	else if (comp)
-	{
-		ft_putstr_fd("minishell: command not found: ", STDERR_FILENO);
-		ft_putstr_fd(comp, STDERR_FILENO);
-		ft_putstr_fd("\n", STDERR_FILENO);
-		g_signal.exit_status = NOT_DIR;
-	}
-	ft_check_after_dir(data);
-}
 
 static char	*ft_find_env_var(char *str, t_env *env_list, int *len)
 {
@@ -216,15 +209,15 @@ static char	*ft_find_env_var(char *str, t_env *env_list, int *len)
 
 char *remove_quotes(char *str)
 {
-    int len = strlen(str);
-    if (len >= 2 && ((str[0] == '"' && str[len - 1] == '"') || (str[0] == '\'' && str[len - 1] == '\'')))
-    {
-        char *new_str = ft_substr(str, 1, len - 2); // Create a new substring without the outer quotes
-        char *result = remove_quotes(new_str); // Recursively remove quotes
-        free(new_str); // Free the intermediate string
-        return result;
-    }
-    return strdup(str); // Return a duplicate of str if no quotes
+	int len = strlen(str);
+	if (len >= 2 && ((str[0] == '"' && str[len - 1] == '"') || (str[0] == '\'' && str[len - 1] == '\'')))
+	{
+		char *new_str = ft_substr(str, 1, len - 2);
+		char *result = remove_quotes(new_str);
+		free(new_str);
+		return result;
+	}
+	return strdup(str);
 }
 
 char *ft_strjoin_arr(char **arr, char c)
@@ -259,26 +252,28 @@ char *ft_replace_substr(char *str, char *substr, int start, int len)
 
 void ft_replace_variables(char **str, t_env *env_list)
 {
-    char *env_var;
-    char *new_str;
-    int i = 0;
-    int var_len = 0;
+	char *env_var;
+	char *new_str;
+	int i = 0;
+	int var_len = 0;
 
-    while ((*str)[i])
-    {
-        if ((*str)[i] == '$')
-        {
-            env_var = ft_find_env_var(&(*str)[i], env_list, &var_len);
-            if (env_var)
-            {
-                new_str = ft_replace_substr(*str, env_var, i, var_len);
-                free(*str);
-                *str = new_str;
-                i += strlen(env_var) - 1;
-            }
-        }
-        i++;
-    }
+	if (*str[0] == '\'' && (*str)[strlen(*str) - 1] == '\'')
+		return;
+	while ((*str)[i])
+	{
+		if ((*str)[i] == '$')
+		{
+			env_var = ft_find_env_var(&(*str)[i], env_list, &var_len);
+			if (env_var)
+			{
+				new_str = ft_replace_substr(*str, env_var, i, var_len);
+				free(*str);
+				*str = new_str;
+				i += strlen(env_var) - 1;
+			}
+		}
+		i++;
+	}
 }
 
 char *get_readline(t_data *data)
@@ -294,12 +289,12 @@ char *get_readline(t_data *data)
 
 void ft_replace_value(t_lexer *lexer_list, t_env *env_list)
 {
-    t_lexer *current_lexer = lexer_list;
-    while (current_lexer)
-    {
-        ft_replace_variables(&(current_lexer->lexer_comp), env_list);
-        current_lexer = current_lexer->next;
-    }
+	t_lexer *current_lexer = lexer_list;
+	while (current_lexer)
+	{
+		ft_replace_variables(&(current_lexer->lexer_comp), env_list);
+		current_lexer = current_lexer->next;
+	}
 }
 
 void	ft_minishell_loop(t_data *data)
@@ -317,11 +312,16 @@ void	ft_minishell_loop(t_data *data)
 	if (!ft_lexer_reader(data))
 		return (ft_error("memory error: unable to assign memory\n", data));
 	ft_replace_value(data->lexer_list, data->env_list);
-	token = ft_check_token_start_end(data->readline);
-	if (token)
-		ft_error_double_token(data, token);
-	ft_parser(data);
-	ft_prepare_executor(data);
+	ft_check_explanation(data);
+	ft_check_if_empty(data);
+	if (!ft_check_is_directory(data->lexer_list->lexer_comp, data))
+	{
+		token = ft_check_token_start_end(data->readline);
+		if (token)
+			ft_error_double_token(data, token);
+		ft_parser(data);
+		ft_prepare_executor(data);
+	}
 	ft_reset_data(data);
 }
 

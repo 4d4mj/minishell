@@ -6,7 +6,7 @@
 /*   By: ajabado <ajabado@student.42beirut.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/13 13:15:05 by akaterji          #+#    #+#             */
-/*   Updated: 2024/07/30 01:03:01 by ajabado          ###   ########.fr       */
+/*   Updated: 2024/07/30 01:26:52 by ajabado          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@
 # include <sys/wait.h>
 # include <fcntl.h>
 # include <string.h>
+# include <sys/stat.h>
 
 typedef struct s_lexer
 {
