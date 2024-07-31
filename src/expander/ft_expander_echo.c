@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_expander_echo.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: akaterji <akaterji@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ajabado <ajabado@student.42beirut.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/26 09:26:38 by akaterji          #+#    #+#             */
-/*   Updated: 2024/07/29 14:12:37 by akaterji         ###   ########.fr       */
+/*   Updated: 2024/07/30 23:51:08 by ajabado          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,27 +102,26 @@ char	*ft_check_quote_string(char *str)
 	return (str);
 }
 
-char	*ft_parse_variable(char **variable, t_lexer *list, char *str, t_data *data)
+char	*ft_parse_variable(char **var, t_lexer *list, char *str, t_data *data)
 {
 	int		i;
 	char	*tmp;
 
 (void) data;
 	i = -1;
-	while (variable[++i])
+	while (var[++i])
 	{
 		if (i != 0)
 			str = ft_strjoin_modified(str, " ");
-		if (variable[i][0] == '$' && variable[i][1] != '\0')
+		if (var[i][0] == '$' && var[i][1] != '\0')
 		{
 			tmp =NULL;
-			//tmp = ft_get_variable(variable[i], data->envp);
 			str = ft_strjoin_modified(str, tmp);
 			if (tmp)
 				free(tmp);
 		}
 		else
-			str = ft_strjoin_modified(str, variable[i]);
+			str = ft_strjoin_modified(str, var[i]);
 	}
 	if (list->next)
 	{
@@ -134,23 +133,23 @@ char	*ft_parse_variable(char **variable, t_lexer *list, char *str, t_data *data)
 void	ft_expander_echo(t_data *data, t_cmd *cmd_list, int flag)
 {
 	t_lexer	*lexer_list;
-	char	**variableiable;
-	char	*str;
+	// char	**variableiable;
+	// char	*str;
 	char	*tmp;
 
-	str = ft_strdup("");
+	// str = ft_strdup("");
 	lexer_list = cmd_list->lexer_list->next;
 	lexer_list = ft_check_n(lexer_list, &flag);
 	if (!lexer_list && flag)
 		ft_reset_data(data);
 	while (lexer_list)
 	{
-		tmp = ft_check_quote_string(ft_strdup(lexer_list->lexer_comp));
-		variableiable = ft_split(tmp, ' ');
-		free (tmp);
-		str = ft_parse_variable(variableiable, lexer_list, str, data);
-		ft_free_arr(variableiable);
+		tmp = ft_strdup(lexer_list->lexer_comp);
+		// variableiable = ft_split(tmp, ' ');
+		// free (tmp);
+		// str = ft_parse_variable(variableiable, lexer_list, str, data);
+		// ft_free_arr(variableiable);
 		lexer_list = lexer_list->next;
 	}
-	ft_print_expander(data, str, flag);
+	ft_print_expander(data, tmp, flag);
 }

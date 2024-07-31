@@ -6,7 +6,7 @@
 /*   By: akaterji <akaterji@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/19 10:44:40 by akaterji          #+#    #+#             */
-/*   Updated: 2024/07/28 15:44:53 by akaterji         ###   ########.fr       */
+/*   Updated: 2024/07/30 08:57:33 by akaterji         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,8 +71,11 @@ void	ft_add_env(t_data *data, char *str, int counter)
 		env_new[i] = ft_strdup(data->envp[i]);
 	i = ft_strlen(str) - 1;
 	if (str[i] == '=')
-		str = ft_strjoin(ft_substr(str, 0, len - 1), "=''");
+		str = ft_strjoin_modified(ft_substr(str, 0, len -1), "''");
 	env_new[len] = ft_strdup(str);
+	env_new[len + 1] = NULL;
+	if (str[i] == '=')
+		free(str);
 	ft_free_arr(data->envp);
 	data->envp = env_new;
 }
@@ -99,8 +102,8 @@ int	ft_check_variables(t_data *data, char **env_variables, int i, int j)
 		if (counter == 0)
 			check = counter;
 		ft_add_env(data, str, counter);
+		free(str);
 		i++;
-		free (str);
 	}
 	return (check);
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_count_quotes.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: akaterji <akaterji@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ajabado <ajabado@student.42beirut.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/13 15:36:29 by akaterji          #+#    #+#             */
-/*   Updated: 2024/07/24 18:39:21 by akaterji         ###   ########.fr       */
+/*   Updated: 2024/07/30 23:10:19 by ajabado          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ int	ft_find_matching_quote(char *line, int index, int *count, int type)
 		else if (line[i] == type)
 			break ;
 		i++;
-	}	
+	}
 	if (line[i] == type)
 		*count += 1;
 	return (i - index);

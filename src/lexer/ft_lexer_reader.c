@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_lexer_reader.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ajabado <ajabado@student.42beirut.com>     +#+  +:+       +#+        */
+/*   By: akaterji <akaterji@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/13 15:58:41 by akaterji          #+#    #+#             */
-/*   Updated: 2024/07/29 23:10:24 by ajabado          ###   ########.fr       */
+/*   Updated: 2024/07/30 17:57:37 by akaterji         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,10 +37,8 @@ int	ft_read_words(char *readline, int index, t_lexer **lexer_list)
 	while (readline[index + j] && !(ft_check_token(readline[index + j])))
 	{
 		if (readline[index + j] == 34 || readline[index + j] == 39)
-		{
 			j += ft_find_matching_quote(readline, index + j,
 					&nb_quote, readline[index + j]);
-		}
 		else if (is_whitespace(readline[index + j]))
 			break ;
 		j++;

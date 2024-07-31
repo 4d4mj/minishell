@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_lexer_utils.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: akaterji <akaterji@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ajabado <ajabado@student.42beirut.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/13 18:06:28 by akaterji          #+#    #+#             */
-/*   Updated: 2024/07/26 08:33:44 by akaterji         ###   ########.fr       */
+/*   Updated: 2024/07/30 23:18:15 by ajabado          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ int	ft_lexer_add(char *readline, int type, t_lexer **lexer_list)
 		&& (readline[0] == 34 || readline[0] == 39))
 	{
 		new_readline = ft_substr(readline, 1, ft_strlen(readline) - 2);
-		free (readline);
+		free(readline);
 		readline = new_readline;
 	}
 	new_lexer = ft_lexer_new(readline, type);

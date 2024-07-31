@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../../includes/minishell.h"
 /**
  * @brief Update the PWD and OLDPWD in the env variable
  * @param data The data structure
@@ -21,24 +21,24 @@ static void	ft_change_path(t_data *data, char *new_path)
 	int	i;
 
 	i = -1;
-	ft_free(data->old_pwd);
+	free(data->old_pwd);
 	data->old_pwd = ft_strdup(data->pwd);
-	ft_free(data->pwd);
+	free(data->pwd);
 	data->pwd = ft_strdup(new_path);
 	while (ft_strlen(data->pwd) > 1
 		&& data->pwd[ft_strlen(data->pwd) - 1] == '/')
 		data->pwd[ft_strlen(data->pwd) - 1] = '\0';
-	ft_free(new_path);
+	free(new_path);
 	while (data->envp[++i])
 	{
 		if (!ft_strncmp(data->envp[i], "PWD=", 4))
 		{
-			ft_free(data->envp[i]);
+			free(data->envp[i]);
 			data->envp[i] = ft_strjoin("PWD=", data->pwd);
 		}
 		else if (!ft_strncmp(data->envp[i], "OLDPWD=", 7) && data->old_pwd)
 		{
-			ft_free(data->envp[i]);
+			free(data->envp[i]);
 			data->envp[i] = ft_strjoin("OLDPWD=", data->old_pwd);
 		}
 	}
@@ -59,13 +59,13 @@ static char	*get_parent_dir(const char *path)
 		len--;
 	if (len == 0)
 	{
-		ft_free((char *)path);
+		free((char *)path);
 		return (ft_strdup("/"));
 	}
 	if (len > 1)
 		len--;
 	parent = ft_strndup(path, len);
-	ft_free((char *)path);
+	free((char *)path);
 	return (parent);
 }
 
@@ -117,6 +117,14 @@ static char	*ft_cd_case(t_data *data, char *path, char *ret, int i)
 			free(ret);
 			ret = ft_strjoin(data->home, components[i] + 1);
 		}
+		else if (components[i][0] == '-' && !i)
+		{
+			free(ret);
+			if (data->old_pwd)
+				ret = ft_strdup(data->old_pwd);
+			else
+				ft_error("cd: OLDPWD not set\n", data);
+		}
 		else if (!strcmp(components[i], "."))
 			continue ;
 		else
@@ -134,8 +142,9 @@ void	ft_mini_cd(t_data *data, t_cmd *cmd_list)
 
 	lexer_list = cmd_list->lexer_list->next;
 	if (!lexer_list)
-		return ;
-	path = ft_cd_case(data, remove_quotes(lexer_list->lexer_comp), ft_strdup(data->pwd), -1);
+		path = ft_strdup(data->home);
+	else
+		path = ft_cd_case(data, remove_quotes(lexer_list->lexer_comp), ft_strdup(data->pwd), -1);
 	check = chdir(path);
 	if (check)
 	{

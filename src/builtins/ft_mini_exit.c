@@ -6,7 +6,7 @@
 /*   By: akaterji <akaterji@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/19 09:32:00 by akaterji          #+#    #+#             */
-/*   Updated: 2024/07/27 12:40:08 by akaterji         ###   ########.fr       */
+/*   Updated: 2024/07/30 09:14:38 by akaterji         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,24 +76,6 @@ int	ft_is_str_digit(char *str)
 	}
 	return (1);
 }
-
-// t_cmd	*ft_cmddup(t_cmd *next_cmd)
-// {
-// 	t_cmd *new_cmd;
-
-// 	new_cmd = ft_cmd_new();
-// 	while (next_cmd)
-// 	{
-// 		new_cmd->commands = ft_arrdup(next_cmd->commands);
-// 		new_cmd->flags = next_cmd->flags;
-// 		new_cmd->heredoc = ft_strdup(next_cmd->heredoc);
-// 		new_cmd->input_file = ft_strdup(next_cmd->input_file);
-// 		new_cmd->input_redir = next_cmd->input_redir;
-// 		new_cmd->output_file = ft_strdup(next_cmd->output_file);
-// 		new_cmd->output_redir = next_cmd->output_redir;
-// 		new_cmd->lexer_list = next_cmd
-// 	}
-// }
 
 int	ft_cmd_delete_prev(t_cmd **cmd_list, t_cmd *next_cmd)
 {

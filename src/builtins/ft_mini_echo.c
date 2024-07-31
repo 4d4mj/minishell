@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_mini_echo.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ajabado <ajabado@student.42beirut.com>     +#+  +:+       +#+        */
+/*   By: akaterji <akaterji@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/19 10:44:12 by akaterji          #+#    #+#             */
-/*   Updated: 2024/07/29 23:28:49 by ajabado          ###   ########.fr       */
+/*   Updated: 2024/07/30 09:05:16 by akaterji         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -163,7 +163,6 @@ void	ft_print_echo(t_data *data, t_lexer *lexer_list, int flag)
 	if (!flag)
 		ft_putstr_fd("\n", STDOUT_FILENO);
 }
-
 
 int	ft_mini_echo(t_data *data, t_cmd *cmd_list)
 {
