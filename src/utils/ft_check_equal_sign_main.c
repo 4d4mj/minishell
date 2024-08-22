@@ -6,7 +6,7 @@
 /*   By: ajabado <ajabado@student.42beirut.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/04 13:34:00 by akaterji          #+#    #+#             */
-/*   Updated: 2024/08/22 03:43:14 by ajabado          ###   ########.fr       */
+/*   Updated: 2024/08/22 05:50:54 by ajabado          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,6 @@ void	update_envp_variable(char *search_key, char *new_value, char **envp)
 		if (!ft_strncmp(search_key, envp[i], ft_strlen_until_equal(envp[i]))
 			&& ft_strlen(search_key) - 1 == ft_strlen_until_equal(envp[i]))
 		{
-			printf("updated envp[i] %s\n", envp[i]);
 			if (new_value != NULL)
 			{
 				free(envp[i]);

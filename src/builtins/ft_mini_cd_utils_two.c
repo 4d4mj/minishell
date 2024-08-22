@@ -6,7 +6,7 @@
 /*   By: ajabado <ajabado@student.42beirut.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/09 11:51:20 by akaterji          #+#    #+#             */
-/*   Updated: 2024/08/22 05:23:15 by ajabado          ###   ########.fr       */
+/*   Updated: 2024/08/22 05:51:09 by ajabado          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,11 +25,8 @@ void	ft_change_to_specified_path(t_data *data, char *path, char *str)
 	}
 	else
 	{
-		printf("before %s\n", str);
 		new_path = ft_normalize_path(data, str);
-		printf("middle %s\n", new_path);
 		ft_change_path(data, new_path);
-		printf("after %s\n", data->pwd);
 	}
 }
 

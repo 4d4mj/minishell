@@ -6,7 +6,7 @@
 /*   By: ajabado <ajabado@student.42beirut.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/04 12:28:08 by akaterji          #+#    #+#             */
-/*   Updated: 2024/08/22 03:41:25 by ajabado          ###   ########.fr       */
+/*   Updated: 2024/08/22 05:51:03 by ajabado          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,6 @@ void	ft_export_case(char *str, char **env_new, int len, int i)
 		env_new[len] = ft_substr(str, 0, len);
 	else
 		env_new[len] = ft_strdup(str);
-	printf("env_new[%d] = %s\n", len, env_new[len]);
 	env_new[len + 1] = NULL;
 }
 

@@ -6,7 +6,7 @@
 /*   By: ajabado <ajabado@student.42beirut.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/19 10:44:40 by akaterji          #+#    #+#             */
-/*   Updated: 2024/08/22 03:18:42 by ajabado          ###   ########.fr       */
+/*   Updated: 2024/08/22 05:50:58 by ajabado          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,6 @@ void	ft_add_env(t_data *data, char **str, int counter)
 	i = 0;
 	while (*str && (*str)[i] != '\0' && (*str)[i] != '=')
 		i++;
-	printf("i %d\n", i);
 	ft_export_case(*str, env_new, len, i);
 	ft_free_arr(data->envp);
 	data->envp = ft_arrdup(env_new);
